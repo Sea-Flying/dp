@@ -1,4 +1,4 @@
-package model
+package artifact
 
 type artifact struct {
 	name  string
