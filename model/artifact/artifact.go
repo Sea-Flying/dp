@@ -1,14 +1,37 @@
 package artifact
 
-type artifact struct {
-	name  string
-	group string
+type Class struct {
+	Name        string
+	Group       string
+	Profile     string
+	Kind        string
+	RepoName    string
+	CreatedTime string
+	GitUrl      string
+	CiUrl       string
+	Description string
 }
 
-type artifactGroup struct {
-	name string
+type Repo struct {
+	Name         string
+	Kind         string
+	ArtifactKind string
+	Url          string
+	BaseUrl      string
+	Descprition  string
+	CreatedTime  string
 }
 
-type artifactRepo struct {
-	name string
+type Entity struct {
+	ClassName     string
+	Version       string
+	Group         string
+	GeneratedTime string
+	Profile       string
+	RepoName      string
+	ClassKind     string
+	Uploader      string
+	Url           string
+	Valid         bool
+	Checksum      string
 }

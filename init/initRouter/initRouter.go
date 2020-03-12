@@ -2,7 +2,8 @@ package initRouter
 
 import "github.com/gin-gonic/gin"
 
-func InitRouter() *gin.Engine {
+func InitRouter() (ApiGroup *gin.RouterGroup) {
 	var Router = gin.Default()
-	ApiGroup := Router.Group("")
+	ApiGroup = Router.Group("")
+	return
 }
