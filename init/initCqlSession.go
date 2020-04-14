@@ -7,11 +7,10 @@ import (
 	"voyageone.com/dp/model"
 )
 
-func InitCqlSession(cqlSession *gocql.Session, keySpace string, config model.DPConfig) {
+func InitCqlSession(cqlSession *gocql.Session, config model.DPConfig) {
 	urlsSlice := strings.Split(config.Cassandra.HostsUrls, ",")
 	cluster := gocql.NewCluster(urlsSlice...)
-	cluster.Keyspace = keySpace
-	cluster.Consistency = gocql.Consistency(1)
+	cluster.Consistency = gocql.Quorum
 	cluster.NumConns = 3
 	var err error
 	cqlSession, err = cluster.CreateSession()

@@ -6,7 +6,6 @@ import (
 )
 
 var (
-	ArtifactCqlSession   gocql.Session
-	ManagementCqlSession gocql.Session
-	DPConfig             model.DPConfig
+	CqlSession gocql.Session
+	DPConfig   model.DPConfig
 )

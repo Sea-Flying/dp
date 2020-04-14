@@ -9,7 +9,7 @@ import (
 
 func main() {
 	init.InitConfig(&global.DPConfig)
-	init.InitCqlSession(&global.ArtifactCqlSession, "artifact", global.DPConfig)
+	init.InitCqlSession(&global.CqlSession, global.DPConfig)
 	dpRouter := init.InitRouter()
 	dpServer := &http.Server{
 		Addr:           global.DPConfig.Base.HttpHost + ":" + global.DPConfig.Base.HttpPort,
