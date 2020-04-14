@@ -34,13 +34,15 @@ func TestScylla_Insert(t *testing.T) {
 	}
 }
 
-func TestGocqlxInsert(t *testing.T){
-	a := {"my_name","my_group"}
-	stmt, names := qb.Insert("artifacts.table_b").Columns("col_1","col_2").ToCql()
+func TestGocqlxInsert(t *testing.T) {
+	type A struct {
+		col_1 string
+		col_2 string
+	}
+	a := A{"my_name", "my_group"}
+	stmt, names := qb.Insert("artifacts.table_b").Columns("col_1", "col_2").ToCql()
 	q := gocqlx.Query(session.Query(stmt), names).BindStruct(a)
 	if err := q.ExecRelease(); err != nil {
 		t.Fatal(err)
 	}
 }
-
-

@@ -1,4 +1,4 @@
-package artifact
+package repository
 
 import (
 	"github.com/scylladb/gocqlx"

@@ -1,13 +1,22 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gocql/gocql"
-	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/scylladb/gocqlx"
-	"gopkg.in/go-playground/webhooks.v5/gitlab"
+	"net/http"
+	"time"
+	"voyageone.com/dp/global"
+	"voyageone.com/dp/init"
 )
 
 func main() {
-
+	init.InitConfig(&global.DPConfig)
+	init.InitCqlSession(&global.ArtifactCqlSession, "artifact", global.DPConfig)
+	dpRouter := init.InitRouter()
+	dpServer := &http.Server{
+		Addr:           global.DPConfig.Base.HttpHost + ":" + global.DPConfig.Base.HttpPort,
+		Handler:        dpRouter,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	dpServer.ListenAndServe()
 }

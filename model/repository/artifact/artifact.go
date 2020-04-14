@@ -12,16 +12,6 @@ type Class struct {
 	Description string
 }
 
-type Repo struct {
-	Name         string
-	Kind         string
-	ArtifactKind string
-	Url          string
-	BaseUrl      string
-	Descprition  string
-	CreatedTime  string
-}
-
 type Entity struct {
 	ClassName     string
 	Version       string
@@ -32,6 +22,15 @@ type Entity struct {
 	ClassKind     string
 	Uploader      string
 	Url           string
-	Valid         bool
 	Checksum      string
+}
+
+type Repo struct {
+	Name         string
+	Kind         string
+	ArtifactKind string
+	Url          string
+	BaseUrl      string
+	Descprition  string
+	CreatedTime  string
 }
