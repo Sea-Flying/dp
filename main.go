@@ -1,16 +1,19 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
-	"voyageone.com/dp/global"
-	"voyageone.com/dp/init"
+	"voyageone.com/dp/infrastructure/entity/global"
+	"voyageone.com/dp/infrastructure/initialize"
+	"voyageone.com/dp/infrastructure/utils"
 )
 
 func main() {
-	init.InitConfig(&global.DPConfig)
-	init.InitCqlSession(&global.CqlSession, global.DPConfig)
-	dpRouter := init.InitRouter()
+	log.Println(utils.GetExecPath())
+	initialize.InitConfig(&global.DPConfig)
+	initialize.InitCqlSession(global.DPConfig)
+	dpRouter := initialize.InitRouter()
 	dpServer := &http.Server{
 		Addr:           global.DPConfig.Base.HttpHost + ":" + global.DPConfig.Base.HttpPort,
 		Handler:        dpRouter,

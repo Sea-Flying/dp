@@ -1,0 +1,4 @@
+base:
+  http-port: 7654
+cassandra:
+  hosts-urls: 127.0.0.1:9043
