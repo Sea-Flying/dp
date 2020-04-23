@@ -13,19 +13,19 @@ var ClassMetadata = table.Metadata{
 }
 
 type Class struct {
-	Group       string
-	Name        string
-	Profile     string
-	Kind        string
+	Group       string    `json:"group"`
+	Name        string    `json:"name"`
+	Profile     string    `json:"profile"`
+	Kind        string    `json:"kind"`
 	RepoName    string    `json:"repo_name"`
 	CreatedTime time.Time `json:"created_time"`
 	GitUrl      string    `json:"git_url"`
 	CiUrl       string    `json:"ci_url"`
-	Description string
+	Description string    `json:"description"`
 }
 
 var EntityMetadata = table.Metadata{
-	Name:    "entity",
+	Name:    "artifact.entity",
 	Columns: []string{"group", "profile", "class_name", "generated_time", "version", "repo_name", "class_kind", "uploader", "url", "checksum"},
 	PartKey: []string{"group", "profile", "class_name"},
 	SortKey: []string{"generated_time"},
@@ -45,18 +45,18 @@ type Entity struct {
 }
 
 var RepoMetadata = table.Metadata{
-	Name:    "repo",
-	Columns: []string{"name", "kind", "url", "baseUrl", "description", "created_time"},
+	Name:    "artifact.repo",
+	Columns: []string{"name", "kind", "web_url", "base_url", "description", "created_time"},
 	PartKey: []string{"name"},
-	SortKey: []string{"created_time"},
+	SortKey: []string{},
 }
 
 type Repo struct {
-	Name         string
-	Kind         string
-	ArtifactKind string `json:"artifact_kind"`
-	Url          string
-	BaseUrl      string
-	Descprition  string
-	CreatedTime  string `json:"created_time"`
+	Name         string    `json:"name"`
+	Kind         string    `json:"kind"`
+	ArtifactKind string    `json:"artifact_kind"`
+	WebUrl       string    `json:"web_url"`
+	BaseUrl      string    `json:"base_url"`
+	Description  string    `json:"description"`
+	CreatedTime  time.Time `json:"created_time"`
 }

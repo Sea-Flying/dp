@@ -8,15 +8,18 @@ import (
 	"voyageone.com/dp/infrastructure/entity/global"
 )
 
-func InitCqlSession(config config.DPConfig) {
-	urlsSlice := strings.Split(config.Cassandra.HostsUrls, ",")
+func InitCqlSession() {
+	var err error
+	global.CqlSession, err = initCqlSession(global.DPConfig.Cassandra)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func initCqlSession(cassandraConfig config.CassandraConfig) (*gocql.Session, error) {
+	urlsSlice := strings.Split(cassandraConfig.HostsUrls, ",")
 	cluster := gocql.NewCluster(urlsSlice...)
 	cluster.Consistency = gocql.Quorum
 	cluster.NumConns = 3
-	var err error
-	global.CqlSession, err = cluster.CreateSession()
-	if err != nil {
-		log.Panic("CQL Session Create Failed!", err)
-		return
-	}
+	return cluster.CreateSession()
 }

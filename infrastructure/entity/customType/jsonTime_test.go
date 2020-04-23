@@ -12,7 +12,7 @@ func TestTimeUnmarshal(t *testing.T) {
 	type myType struct {
 		Id   int
 		Name string
-		Time DpJsonTime
+		Time dpJsonTime
 	}
 	bytestr := []byte(myTypeStr)
 
