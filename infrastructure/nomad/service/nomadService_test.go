@@ -1,20 +1,15 @@
-package initialize
+package service
 
 import (
+	"fmt"
 	"github.com/hashicorp/nomad/api"
+	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
+	"testing"
 	"voyageone.com/dp/infrastructure/model/config"
 	"voyageone.com/dp/infrastructure/model/global"
 )
-
-func InitNomadClient() {
-	var err error
-	global.NomadClient, err = initNomadClient(global.DPConfig.Nomad)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
 	config := api.DefaultConfig()
@@ -35,4 +30,22 @@ func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
 		return nil, err
 	}
 	return client, nil
+}
+
+func init() {
+	_ = cleanenv.ReadConfig("D:/Develop/go/dp/dp.yml", &global.DPConfig)
+	var err error
+	global.NomadClient, err = initNomadClient(global.DPConfig.Nomad)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestGetJobLastDeploymentHealth(t *testing.T) {
+	health, err := GetJobLastDeploymentHealth(global.NomadClient, "openvms-restapi-dp")
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(health)
+	}
 }

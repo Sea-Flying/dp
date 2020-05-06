@@ -25,7 +25,7 @@ type Class struct {
 }
 
 var EntityMetadata = table.Metadata{
-	Name:    "artifact.entity",
+	Name:    "artifact.model",
 	Columns: []string{"group", "profile", "class_name", "generated_time", "version", "repo_name", "class_kind", "uploader", "url", "checksum"},
 	PartKey: []string{"group", "profile", "class_name"},
 	SortKey: []string{"generated_time"},

@@ -3,14 +3,15 @@ package service
 import (
 	"fmt"
 	"github.com/gocql/gocql"
+	"github.com/imdario/mergo"
 	"log"
 	"os"
 	"testing"
 	"time"
 	"voyageone.com/dp/artifactKeeper/model/repository"
 	artifactService "voyageone.com/dp/artifactKeeper/service"
-	"voyageone.com/dp/infrastructure/entity/global"
-	"voyageone.com/dp/scheduler/model"
+	"voyageone.com/dp/infrastructure/model/global"
+	repository2 "voyageone.com/dp/scheduler/model/repository"
 )
 
 func init() {
@@ -26,7 +27,7 @@ func init() {
 }
 
 func TestCreateOrUpdateDeployer(t *testing.T) {
-	var deployer = model.Deployer{
+	var deployer = repository2.Deployer{
 		Name:                    "vo_local_nomad",
 		Kind:                    "nomad",
 		Description:             "VO local staging Nomad cluster",
@@ -43,7 +44,7 @@ func TestCreateOrUpdateDeployer(t *testing.T) {
 }
 
 func TestGetDeployerByName(t *testing.T) {
-	var d = model.Deployer{
+	var d = repository2.Deployer{
 		Name: "vo_local_nomad",
 	}
 	err := GetDeployerByName(&d)
@@ -55,7 +56,7 @@ func TestGetDeployerByName(t *testing.T) {
 }
 
 func TestCreateOrUpdataTemplate(t *testing.T) {
-	var nt = model.NomadTemplate{
+	var nt = repository2.NomadTemplate{
 		Name:        "vo_local_nomad_jar",
 		GitUrl:      "http://10.0.0.85/nomad-jobs/nomoad-jobs-template/vo_local_nomad_jar.git",
 		GroupTags:   nil,
@@ -66,11 +67,11 @@ func TestCreateOrUpdataTemplate(t *testing.T) {
 			"ClassName":        "",
 			"EntityVersion":    "",
 			"EntityUrl":        "",
-			"CanaryNum":        "",
-			"JvmOpts:-Xmx":     "",
-			"JvmOpts:-Xms":     "",
-			"Resources:cpu":    "",
-			"Resources:memory": "",
+			"CanaryNum":        "0",
+			"JvmOpts:-Xmx":     "512m",
+			"JvmOpts:-Xms":     "512m",
+			"Resources:cpu":    "500",
+			"Resources:memory": "1024",
 		},
 	}
 	err := CreateOrUpdataTemplate(nt)
@@ -80,8 +81,9 @@ func TestCreateOrUpdataTemplate(t *testing.T) {
 }
 
 func TestCreateOrUpdateJob(t *testing.T) {
-	var j = model.DPJob{
+	var j = repository2.DPJob{
 		Id:                  gocql.TimeUUID(),
+		Kind:                "immediate",
 		Group:               "voerp",
 		Profile:             "staging",
 		ClassName:           "openvms-restapi-dp",
@@ -117,9 +119,21 @@ func TestCreateOrUpdateJob(t *testing.T) {
 	}
 }
 
+func TestGetNomadTemplateByName(t *testing.T) {
+	nt := repository2.NomadTemplate{
+		Name: "vo_local_nomad_jar",
+	}
+	err := GetNomadTemplateByName(&nt)
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(nt)
+	}
+}
+
 func TestGetJobById(t *testing.T) {
 	jid, _ := gocql.ParseUUID("9f8126c7-845d-11ea-b535-8cec4baae5bd")
-	var j = model.DPJob{
+	var j = repository2.DPJob{
 		Id: jid,
 	}
 	err := GetJobById(&j)
@@ -128,4 +142,17 @@ func TestGetJobById(t *testing.T) {
 	} else {
 		fmt.Println(j)
 	}
+}
+
+func TestMergeTemplateDefaultParamsIntoJob(t *testing.T) {
+	a := map[string]string{
+		"a": "1",
+		"b": "2",
+	}
+	b := map[string]string{
+		"b": "3",
+		"c": "4",
+	}
+	mergo.Merge(&a, b)
+	fmt.Println(a)
 }

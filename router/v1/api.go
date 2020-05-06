@@ -8,6 +8,6 @@ func InitApiRouter(Engine *gin.Engine) {
 	ApiRouter := Engine.Group("api/v1")
 	{
 		initArtifactApiGroup(ApiRouter)
-		initManagementApiGroup(ApiRouter)
+		InitScheduleApiGroup(ApiRouter)
 	}
 }

@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"voyageone.com/dp/artifactKeeper/model/repository"
 	"voyageone.com/dp/artifactKeeper/service"
-	. "voyageone.com/dp/infrastructure/entity/global"
-	"voyageone.com/dp/infrastructure/entity/response"
+	. "voyageone.com/dp/infrastructure/model/global"
+	"voyageone.com/dp/infrastructure/model/response"
 )
 
 func CreataRepo(c *gin.Context) {
@@ -41,6 +41,7 @@ func CreateEntity(c *gin.Context) {
 	if err != nil || repo.BaseUrl == "" {
 		DPLogger.Printf("Create or Update Entity Failed: repoName %s is not existed \n", entity.RepoName)
 		DPLogger.Println(err)
+		response.FailWithMessage(fmt.Sprintf("Artifact Entity Create Failed，%v", err), c)
 		return
 	}
 	//如果entity的url为空，则生成为默认值

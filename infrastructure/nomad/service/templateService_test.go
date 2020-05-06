@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 	"time"
-	"voyageone.com/dp/infrastructure/entity/config"
-	"voyageone.com/dp/infrastructure/entity/global"
-	"voyageone.com/dp/scheduler/model"
+	"voyageone.com/dp/infrastructure/model/config"
+	"voyageone.com/dp/infrastructure/model/global"
+	"voyageone.com/dp/scheduler/model/repository"
 )
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 
 func TestRenderJobTemplate(t *testing.T) {
 	jid, _ := gocql.ParseUUID("9f8126c7-845d-11ea-b535-8cec4baae5bd")
-	var j = model.DPJob{
+	var j = repository.DPJob{
 		Id:                  jid,
 		Group:               "voerp",
 		Profile:             "staging",

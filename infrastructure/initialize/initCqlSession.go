@@ -4,8 +4,8 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"strings"
-	"voyageone.com/dp/infrastructure/entity/config"
-	"voyageone.com/dp/infrastructure/entity/global"
+	"voyageone.com/dp/infrastructure/model/config"
+	"voyageone.com/dp/infrastructure/model/global"
 )
 
 func InitCqlSession() {

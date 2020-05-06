@@ -9,11 +9,11 @@ type DPConfig struct {
 
 type BaseConfig struct {
 	HttpPort string `yaml:"http-port" env:"BASE_HTTP_PORT" `
-	HttpHost string `yaml:"http-host" env:"BASE_HTTP_HOST" env-default:"7654"`
+	HttpHost string `yaml:"http-host" env:"BASE_HTTP_HOST" `
 }
 
 type CassandraConfig struct {
-	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-default:"127.0.0.1:9043" env-description:"connection urls of Cassandra instances, comma-separated"`
+	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-description:"connection urls of Cassandra instances, comma-separated"`
 }
 
 type NomadConfig struct {

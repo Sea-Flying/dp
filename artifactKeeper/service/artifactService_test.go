@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 	"voyageone.com/dp/artifactKeeper/model/repository"
-	"voyageone.com/dp/infrastructure/entity/global"
+	"voyageone.com/dp/infrastructure/model/global"
 )
 
 func init() {

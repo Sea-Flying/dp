@@ -5,7 +5,8 @@ import (
 	"github.com/scylladb/gocqlx/qb"
 	"github.com/scylladb/gocqlx/table"
 	"voyageone.com/dp/artifactKeeper/model/repository"
-	. "voyageone.com/dp/infrastructure/entity/global"
+	"voyageone.com/dp/infrastructure/model/customType"
+	. "voyageone.com/dp/infrastructure/model/global"
 )
 
 func CreateOrUpdateRepo(r repository.Repo) error {
@@ -80,6 +81,9 @@ func GetEntityByPrimaryKey(e *repository.Entity) error {
 }
 
 func GetEntityByVersionPartitionKey(e *repository.Entity) error {
+	if e.ClassName == "" || e.Profile == "" || e.Group == "" || e.Version == "" {
+		return customType.DPError("not sufficient fields provided when execute GetEntityByVersionPartitionKey")
+	}
 	err := CqlSession.Query(`SELECT url, generated_time FROM artifact.mv_entity_by_version 
           WHERE version=? and group=? and profile=? and class_name=?`, e.Version, e.Group, e.Profile, e.ClassName).
 		Scan(&e.Url, &e.GeneratedTime)

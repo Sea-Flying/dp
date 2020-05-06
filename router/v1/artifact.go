@@ -2,20 +2,19 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"voyageone.com/dp/artifactKeeper/handler"
+	artifactHandler "voyageone.com/dp/artifactKeeper/handler"
 )
 
-func initArtifactApiGroup(ApiRouter *gin.RouterGroup) {
-	artifactApiGroup := ApiRouter.Group("artifact")
-	ClassRouter := artifactApiGroup.Group("class")
+func initArtifactApiGroup(apiRootRouter *gin.RouterGroup) {
+	artifactApiGroup := apiRootRouter.Group("artifact")
 	{
-		ClassRouter.POST("", handler.CreateClass)
-		ClassRouter.GET("")
-		ClassRouter.DELETE("")
-	}
-	EntityRouter := artifactApiGroup.Group("entity")
-	{
-		EntityRouter.POST("")
-		EntityRouter.GET("")
+		artifactApiGroup.POST("repo", artifactHandler.CreataRepo)
+
+		artifactApiGroup.POST("class", artifactHandler.CreateClass)
+		artifactApiGroup.GET("class")
+		artifactApiGroup.DELETE("class")
+
+		artifactApiGroup.POST("model", artifactHandler.CreateEntity)
+		artifactApiGroup.GET("model")
 	}
 }

@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"path"
 	"text/template"
-	"voyageone.com/dp/scheduler/model"
+	"voyageone.com/dp/scheduler/model/repository"
 )
 
-func RenderJobTemplate(j model.DPJob, tpath string) (jobHcl string, err error) {
+func RenderJobTemplate(j repository.DPJob, tpath string) (jobHcl string, err error) {
 	name := path.Base(tpath)
 	t := template.Must(template.New(name).Delims("<<", ">>").ParseFiles(tpath))
 	buf := bytes.Buffer{}

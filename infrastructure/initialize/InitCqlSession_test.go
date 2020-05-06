@@ -4,7 +4,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/ilyakaznacheev/cleanenv"
 	"testing"
-	"voyageone.com/dp/infrastructure/entity/config"
+	"voyageone.com/dp/infrastructure/model/config"
 )
 
 var dpConfig config.DPConfig

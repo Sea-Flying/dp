@@ -3,7 +3,7 @@ package initialize
 import (
 	"fmt"
 	"testing"
-	"voyageone.com/dp/infrastructure/entity/global"
+	"voyageone.com/dp/infrastructure/model/global"
 )
 
 func TestInitNomadClient(t *testing.T) {

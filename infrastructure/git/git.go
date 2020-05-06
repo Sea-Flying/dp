@@ -4,14 +4,14 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"os"
-	. "voyageone.com/dp/infrastructure/entity/global"
+	. "voyageone.com/dp/infrastructure/model/global"
 	"voyageone.com/dp/infrastructure/utils"
-	"voyageone.com/dp/scheduler/model"
+	"voyageone.com/dp/scheduler/model/repository"
 	"voyageone.com/dp/scheduler/service"
 )
 
-func GitCloneHclTemplate(job model.DPJob, gitTargetDir string) error {
-	var nomadtemplate = model.NomadTemplate{
+func GitCloneHclTemplate(job repository.DPJob, gitTargetDir string) error {
+	var nomadtemplate = repository.NomadTemplate{
 		Name: job.NomadTemplateName,
 	}
 	getNomadTplErr := service.GetNomadTemplateByName(&nomadtemplate)

@@ -4,7 +4,7 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/hashicorp/nomad/api"
 	"log"
-	"voyageone.com/dp/infrastructure/entity/config"
+	"voyageone.com/dp/infrastructure/model/config"
 )
 
 var (
