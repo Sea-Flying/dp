@@ -13,8 +13,8 @@ build:
       - /^master$/
   script:
     - docker build -t dp:beta .
-    - docker tag dp:beta harbor.cloud-voyageone.cn/dp:$image_version
-    - docker push harbor.cloud-voyageone.cn/dp:$image_version
+    - docker tag dp:beta harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker push harbor.cloud-voyageone.cn/devops/dp:$image_version
 
 run:
   stage: run
@@ -25,5 +25,5 @@ run:
     refs:
       - /^master$/
   script:
-    - docker pull harbor.cloud-voyageone.cn/dp:$image_version
-    - docker run -d --name vo-dp -p 10.0.0.143:7654:7654 harbor.cloud-voyageone.cn/dp:$image_version
+    - docker pull harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker run -d --name vo-dp -p 10.0.0.143:7654:7654 harbor.cloud-voyageone.cn/devops/dp:$image_version
