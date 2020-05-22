@@ -11,19 +11,16 @@ import (
 	. "voyageone.com/dp/infrastructure/model/global"
 	"voyageone.com/dp/infrastructure/model/response"
 	nomadService "voyageone.com/dp/infrastructure/nomad/service"
-	"voyageone.com/dp/scheduler/model/repository"
+	schedulerRepository "voyageone.com/dp/scheduler/model/repository"
 	"voyageone.com/dp/scheduler/service"
 )
 
 func SubbmitJobImmediately(c *gin.Context) {
-	var job repository.DPJob
+	var job schedulerRepository.DPJob
 	var err error
 	_ = c.ShouldBindJSON(&job)
-	{
-		job.Kind = "immediate"
-		job.CreatedTime = time.Now()
-		job.Status = "executing"
-	}
+	// set some immediate job default
+	fillDefaultsIntoImmediateJob(&job)
 	err = fillDefaultsIntoJob(&job)
 	if err != nil {
 		goto ErrorReturn
@@ -53,7 +50,7 @@ ErrorReturn:
 }
 
 func CreateOrUpdateDeployer(c *gin.Context) {
-	var deployer repository.Deployer
+	var deployer schedulerRepository.Deployer
 	_ = c.ShouldBindJSON(deployer)
 	err := service.CreateOrUpdateDeployer(deployer)
 	if err != nil {
@@ -66,7 +63,7 @@ func CreateOrUpdateDeployer(c *gin.Context) {
 }
 
 func CreateOrUpdateJob(c *gin.Context) {
-	var job repository.DPJob
+	var job schedulerRepository.DPJob
 	_ = c.ShouldBindJSON(job)
 	err := service.CreateOrUpdateJob(job)
 	if err != nil {
@@ -79,7 +76,7 @@ func CreateOrUpdateJob(c *gin.Context) {
 }
 
 func CreateOrUpdateJobTemplate(c *gin.Context) {
-	var nt repository.NomadTemplate
+	var nt schedulerRepository.NomadTemplate
 	_ = c.ShouldBindJSON(nt)
 	err := service.CreateOrUpdataTemplate(nt)
 	if err != nil {
@@ -106,7 +103,15 @@ func CheckJobLastDeploymentStatus(c *gin.Context) {
 	}
 }
 
-func fillDefaultsIntoJob(j *repository.DPJob) (err error) {
+// 填充Immediate Job的特定默认值到Job对象中
+func fillDefaultsIntoImmediateJob(j *schedulerRepository.DPJob) {
+	j.Kind = "immediate"
+	j.CreatedTime = time.Now()
+	j.Status = "executing"
+}
+
+// 填充默认值到Job对象中
+func fillDefaultsIntoJob(j *schedulerRepository.DPJob) (err error) {
 	j.Id = gocql.TimeUUID()
 	e := artifactRepository.Entity{
 		Group:     j.Group,
@@ -118,12 +123,24 @@ func fillDefaultsIntoJob(j *repository.DPJob) (err error) {
 	if err != nil {
 		return err
 	}
+	var c = artifactRepository.Class{
+		Group:   e.Group,
+		Name:    e.ClassName,
+		Profile: e.Profile,
+	}
+	err = artifactService.GetClassByPrimaryKey(&c)
+	if err != nil {
+		return err
+	}
 	j.EntityGeneratedTime = e.GeneratedTime
 	if j.NomadTemplateParams == nil {
 		j.NomadTemplateParams = map[string]string{}
 	}
 	if j.Kind == "immediate" {
 		j.ExecutedTime = j.CreatedTime
+	}
+	if j.NomadTemplateName == "" {
+		j.NomadTemplateName = c.DefaultNomadTemplate
 	}
 	if j.NomadTemplateParams["ClassName"] == "" {
 		j.NomadTemplateParams["ClassName"] = j.ClassName
@@ -132,40 +149,50 @@ func fillDefaultsIntoJob(j *repository.DPJob) (err error) {
 		j.NomadTemplateParams["EntityVersion"] = j.EntityVersion
 	}
 	if j.NomadTemplateParams["EntityUrl"] == "" {
-		e := artifactRepository.Entity{
-			Group:     j.Group,
-			Profile:   j.Profile,
-			ClassName: j.ClassName,
-			Version:   j.EntityVersion,
+		j.NomadTemplateParams["EntityUrl"] = e.Url
+	}
+	if j.DeployerName == "" {
+		var dd = schedulerRepository.DefaultDeployer{
+			Group: j.Group,
 		}
-		err := artifactService.GetEntityByVersionPartitionKey(&e)
+		err = service.GetDefaultDeployerByGroup(&dd)
 		if err != nil {
 			return err
 		}
-		j.NomadTemplateParams["EntityUrl"] = e.Url
+		j.DeployerName = dd.ProfileDeployer[j.Profile]
+	}
+	err = service.MergeClassDefaultParamsIntoJob(j, c)
+	if err != nil {
+		return err
 	}
 	err = service.MergeTemplateDefaultParamsIntoJob(j)
 	return err
 }
 
-func submitJobProcedure(job repository.DPJob) (err error) {
+// Nomad Job的渲染、验证和提交
+func submitJobProcedure(job schedulerRepository.DPJob) (err error) {
+	//git clone Job HCL template
 	err = git.GitCloneHclTemplate(job, DPConfig.Nomad.NomadJobTplDir)
 	if err != nil {
 		return
 	}
 	templateDir := DPConfig.Nomad.NomadJobTplDir + "/" + job.NomadTemplateName + "/" + job.NomadTemplateName + ".tpl"
+	//根据传入的template参数渲染出实际的Job HCL文本
 	jobStr, err := nomadService.RenderJobTemplate(job, templateDir)
 	if err != nil {
 		return
 	}
+	//nomad parse Job HCL string to Job JSON Object
 	nomadJob, err := nomadService.ParseJob(NomadClient, jobStr)
 	if err != nil {
 		return
 	}
+	//nomad plan job
 	err = nomadService.PlanJob(NomadClient, nomadJob)
 	if err != nil {
 		return
 	}
+	//nomad run job
 	err = nomadService.SubmitJob(NomadClient, nomadJob)
 	return
 }

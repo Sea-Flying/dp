@@ -97,3 +97,36 @@ func GetEntityByVersionPartitionKey(e *repository.Entity) error {
 func ReadManyEntityRecently(many int) {
 
 }
+
+func CreateOrUpdateKind(k repository.Kind) error {
+	stmt, names := qb.Insert(repository.KindMetadata.Name).
+		Columns(repository.KindMetadata.Columns...).ToCql()
+	q := gocqlx.Query(CqlSession.Query(stmt), names).BindStruct(k)
+	err := q.ExecRelease()
+	if err != nil {
+		DPLogger.Println(err)
+	}
+	return err
+}
+
+func GetKindByPrimaryKey(k *repository.Kind) error {
+	var classTable = table.New(repository.KindMetadata)
+	stmt, names := classTable.Get()
+	q := gocqlx.Query(CqlSession.Query(stmt), names).BindStruct(*k)
+	err := q.GetRelease(k)
+	if err != nil {
+		DPLogger.Println(err)
+	}
+	return err
+}
+
+func GetDefaultRepoByGroup(dr *repository.DefaultRepo) error {
+	var defaultRepoTable = table.New(repository.DefaultRepoMetadata)
+	stmt, names := defaultRepoTable.Get()
+	q := gocqlx.Query(CqlSession.Query(stmt), names).BindStruct(*dr)
+	err := q.GetRelease(dr)
+	if err != nil {
+		DPLogger.Println(err)
+	}
+	return err
+}

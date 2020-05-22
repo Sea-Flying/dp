@@ -156,3 +156,15 @@ func TestMergeTemplateDefaultParamsIntoJob(t *testing.T) {
 	mergo.Merge(&a, b)
 	fmt.Println(a)
 }
+
+func TestGetDefaultDeployerByGroup(t *testing.T) {
+	var dd = repository2.DefaultDeployer{
+		Group: "voerp",
+	}
+	err := GetDefaultDeployerByGroup(&dd)
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(dd.ProfileDeployer["staging"])
+	}
+}

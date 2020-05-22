@@ -11,10 +11,10 @@ func initArtifactApiGroup(apiRootRouter *gin.RouterGroup) {
 		artifactApiGroup.POST("repo", artifactHandler.CreataRepo)
 
 		artifactApiGroup.POST("class", artifactHandler.CreateClass)
-		artifactApiGroup.GET("class")
+		artifactApiGroup.GET("class", artifactHandler.GetClass)
 		artifactApiGroup.DELETE("class")
 
-		artifactApiGroup.POST("model", artifactHandler.CreateEntity)
-		artifactApiGroup.GET("model")
+		artifactApiGroup.POST("entity", artifactHandler.CreateEntity)
+		artifactApiGroup.GET("entity")
 	}
 }

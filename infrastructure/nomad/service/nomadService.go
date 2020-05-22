@@ -47,7 +47,13 @@ func GetJobLastDeploymentHealth(client *api.Client, jobId string) (healthy bool,
 		healthy = false
 		return
 	}
-	if scaleStatusResp.TaskGroups["group"].Placed == scaleStatusResp.TaskGroups["group"].Desired &&
+	job, _, err := nomadJobsEndpoint.Info(jobId, nil)
+	if err != nil {
+		healthy = false
+		return
+	}
+	if *(job.Status) == "running" &&
+		scaleStatusResp.TaskGroups["group"].Placed == scaleStatusResp.TaskGroups["group"].Desired &&
 		scaleStatusResp.TaskGroups["group"].Healthy == scaleStatusResp.TaskGroups["group"].Placed {
 		return true, nil
 	} else {

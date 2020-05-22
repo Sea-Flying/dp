@@ -8,7 +8,7 @@ import (
 	. "voyageone.com/dp/infrastructure/model/global"
 )
 
-var dpConfigPath = flag.String("config", "./dp.yml", "the YAML config file ")
+var dpConfigPath = flag.String("config", "D:/Develop/go/dp/dp.yml", "the YAML config file ")
 
 func main() {
 	flag.Parse()

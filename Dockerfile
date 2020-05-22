@@ -13,4 +13,6 @@ FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 WORKDIR /usr/local/bin
 COPY --from=builder /app/dp .
+COPY --from=builder /app/resources/dp.yml ./dp.yml
+RUN mkdir /app/jobHclDir /app/jobTplDir
 CMD ["./dp"]
