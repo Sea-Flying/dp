@@ -7,7 +7,7 @@ variables:
 
 build:
   stage: build
-  image: docker
+  image: docker:18.09
   only:
     refs:
       - /^master$/
