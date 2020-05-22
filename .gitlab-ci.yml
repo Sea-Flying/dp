@@ -12,8 +12,8 @@ build:
     refs:
       - /^master$/
   script:
-    - docker build -t dp:beta .
-    - docker tag dp:beta harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker build -t dp:$image_version .
+    - docker tag dp:$image_version harbor.cloud-voyageone.cn/devops/dp:$image_version
     - docker login harbor.cloud-voyageone.cn -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker push harbor.cloud-voyageone.cn/devops/dp:$image_version
 
