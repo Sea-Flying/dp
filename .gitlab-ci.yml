@@ -1,0 +1,29 @@
+stages:
+  - build
+  - run
+
+variables:
+  image_version: beta
+
+build:
+  stage: build
+  image: docker
+  only:
+    refs:
+      - /^master$/
+  script:
+    - docker build -t dp:beta .
+    - docker tag dp:beta harbor.cloud-voyageone.cn/dp:$image_version
+    - docker push harbor.cloud-voyageone.cn/dp:$image_version
+
+run:
+  stage: run
+  tags:
+    - "130"
+    - shell
+  only:
+    refs:
+      - /^master$/
+  script:
+    - docker pull harbor.cloud-voyageone.cn/dp:$image_version
+    - docker run -d --name vo-dp -p 10.0.0.143:7654:7654 harbor.cloud-voyageone.cn/dp:$image_version
