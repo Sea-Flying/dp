@@ -14,6 +14,7 @@ build:
   script:
     - docker build -t dp:beta .
     - docker tag dp:beta harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker login harbor.cloud-voyageone.cn -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - docker push harbor.cloud-voyageone.cn/devops/dp:$image_version
 
 run:
