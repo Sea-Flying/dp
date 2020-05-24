@@ -27,4 +27,6 @@ run:
       - /^master$/
   script:
     - docker pull harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker stop vo-dp
+    - docker rm vo-dp
     - docker run -d --name vo-dp -p 10.0.0.143:7654:7654 harbor.cloud-voyageone.cn/devops/dp:$image_version
