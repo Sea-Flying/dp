@@ -30,7 +30,7 @@ type Class struct {
 var EntityMetadata = table.Metadata{
 	Name: "artifact.entity",
 	Columns: []string{"group", "profile", "class_name", "generated_time", "version", "repo_name", "class_kind",
-		"uploader", "url", "checksum"},
+		"uploader", "url", "checksum", "valid"},
 	PartKey: []string{"group", "profile", "class_name"},
 	SortKey: []string{"generated_time"},
 }
@@ -46,6 +46,7 @@ type Entity struct {
 	Uploader      string    `json:"uploader"`
 	Url           string    `json:"url"`
 	Checksum      string    `json:"checksum"`
+	Valid         bool      `json:"valid"`
 }
 
 var RepoMetadata = table.Metadata{
