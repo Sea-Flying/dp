@@ -8,22 +8,22 @@ type DPConfig struct {
 }
 
 type BaseConfig struct {
-	HttpPort string `yaml:"http-port" env:"BASE_HTTP_PORT" `
-	HttpHost string `yaml:"http-host" env:"BASE_HTTP_HOST" `
+	HttpPort string `yaml:"http-port" env:"BASE_HTTP_PORT" env-default:"7654"`
+	HttpHost string `yaml:"http-host" env:"BASE_HTTP_HOST" env-default:""`
 }
 
 type CassandraConfig struct {
-	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-description:"connection urls of Cassandra instances, comma-separated"`
+	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-default:"127.0.0.1:9043"`
 }
 
 type NomadConfig struct {
-	NomadApiUrl    string `yaml:"api-url" env:"NOMAD_ADDR"`
-	NomadRegion    string `yaml:"region" env:"NOMAD_REGION"`
-	NomadJobTplDir string `yaml:"job-tpl-dir" env:"NOMAD_JOB_TPL_DIR"`
-	NomadJobHclDir string `yaml:"job-hcl-dir" env:"NOMAD_JOB_HCL_DIR"`
+	NomadApiUrl    string `yaml:"api-url" env:"NOMAD_ADDR" env-default:"http://10.0.0.152:4646"`
+	NomadRegion    string `yaml:"region" env:"NOMAD_REGION" env-default:"vo-local"`
+	NomadJobTplDir string `yaml:"job-tpl-dir" env:"NOMAD_JOB_TPL_DIR" env-default:"D:/tmp/jobtpldir"`
+	NomadJobHclDir string `yaml:"job-hcl-dir" env:"NOMAD_JOB_HCL_DIR" env-default:"D:/tmp/jobhcldir"`
 }
 
 type GitlabConfig struct {
-	Username string `yaml:"username" env:"GITLAB_USERNAME"`
-	Token    string `yaml:"token" env:"GITLAB_TOKEN"`
+	Username string `yaml:"username" env:"GITLAB_USERNAME" env-default:"dp"`
+	Token    string `yaml:"token" env:"GITLAB_TOKEN" env-default:"f4fc2yUEsVxdfa9zG9ev"`
 }

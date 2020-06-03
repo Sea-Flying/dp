@@ -4,6 +4,7 @@ import (
 	"github.com/gocql/gocql"
 	"log"
 	"strings"
+	"time"
 	"voyageone.com/dp/infrastructure/model/config"
 	"voyageone.com/dp/infrastructure/model/global"
 )
@@ -21,5 +22,7 @@ func initCqlSession(cassandraConfig config.CassandraConfig) (*gocql.Session, err
 	cluster := gocql.NewCluster(urlsSlice...)
 	cluster.Consistency = gocql.Quorum
 	cluster.NumConns = 3
+	cluster.ConnectTimeout = 1 * time.Second
+	cluster.Timeout = 2 * time.Second
 	return cluster.CreateSession()
 }
