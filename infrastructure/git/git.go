@@ -27,10 +27,7 @@ func GitCloneHclTemplate(job repository.DPJob, gitTargetDir string) error {
 	}
 	//判断git仓库的文件夹是否存在
 	if !utils.FileExists(gitRepoDir) {
-		mkdirError := os.MkdirAll(gitRepoDir, os.ModePerm|os.ModeDir)
-		if mkdirError != nil {
-			return mkdirError
-		}
+		os.MkdirAll(gitRepoDir, os.ModePerm|os.ModeDir)
 		goto GitClone
 	}
 	//判断git仓库(.git)是否已经存在
@@ -55,7 +52,6 @@ GitPull:
 		gitPullErr := w.Pull(&git.PullOptions{
 			RemoteName: "origin",
 			Auth:       &httpAuth,
-			Force:      true,
 		})
 		if gitPullErr == nil || gitPullErr == git.NoErrAlreadyUpToDate {
 			return nil

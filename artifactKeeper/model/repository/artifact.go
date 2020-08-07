@@ -66,9 +66,21 @@ type Repo struct {
 	CreatedTime  time.Time `json:"created_time"`
 }
 
+var DefaultRepoMetadata = table.Metadata{
+	Name:    "artifact.default_repo",
+	Columns: []string{"group", "profile_repo"},
+	PartKey: []string{"group"},
+	SortKey: nil,
+}
+
+type DefaultRepo struct {
+	Group       string            `json:"group"`
+	ProfileRepo map[string]string `json:"profile_repo"`
+}
+
 var KindMetadata = table.Metadata{
 	Name:    "artifact.kind",
-	Columns: []string{"group", "name", "profile_default_repo", "profile_default_template", "created_time"},
+	Columns: []string{"group", "name", "profile_default_template", "created_time"},
 	PartKey: []string{"group", "name"},
 	SortKey: nil,
 }
@@ -76,7 +88,6 @@ var KindMetadata = table.Metadata{
 type Kind struct {
 	Group                  string            `json:"group"`
 	Name                   string            `json:"name"`
-	ProfileDefaultRepo     map[string]string `json:"profile_default_repo"`
 	ProfileDefaultTemplate map[string]string `json:"profile_default_template"`
 	CreatedTime            time.Time         `json:"created_time"`
 }

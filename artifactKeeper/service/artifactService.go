@@ -119,3 +119,14 @@ func GetKindByPrimaryKey(k *repository.Kind) error {
 	}
 	return err
 }
+
+func GetDefaultRepoByGroup(dr *repository.DefaultRepo) error {
+	var defaultRepoTable = table.New(repository.DefaultRepoMetadata)
+	stmt, names := defaultRepoTable.Get()
+	q := gocqlx.Query(CqlSession.Query(stmt), names).BindStruct(*dr)
+	err := q.GetRelease(dr)
+	if err != nil {
+		DPLogger.Println(err)
+	}
+	return err
+}
