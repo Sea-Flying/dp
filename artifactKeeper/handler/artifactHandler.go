@@ -102,15 +102,6 @@ func fillDefaultsIntoClass(c *repository.Class) error {
 	}
 	c.CreatedTime = time.Now()
 	c.DefaultNomadTemplate = kind.ProfileDefaultTemplate[c.Profile]
-	var defaultRepo = repository.DefaultRepo{
-		Group: c.Group,
-	}
-	if c.RepoName == "" {
-		err = service.GetDefaultRepoByGroup(&defaultRepo)
-		if err != nil {
-			return customType.DPError(fmt.Sprintf("fill class default template failed when get default repo %#v", err))
-		}
-		c.RepoName = defaultRepo.ProfileRepo[c.Profile]
-	}
+	c.RepoName = kind.ProfileDefaultRepo[c.Profile]
 	return nil
 }

@@ -1,12 +1,2 @@
 base:
   http-port: 7654
-cassandra:
-  hosts-urls: 127.0.0.1:9043
-nomad:
-  api-url: http://10.0.0.152:4646
-  region: vo-local
-  job-hcl-dir: "D:/tmp/jobhcldir"
-  job-tpl-dir: "D:/tmp/jobtpldir"
-gitlab:
-  username: dp
-  token: f4fc2yUEsVxdfa9zG9ev

@@ -133,15 +133,3 @@ func TestOsOpen(t *testing.T) {
 		}
 	}
 }
-
-func TestGetDefaultRepoByGroup(t *testing.T) {
-	var dr = repository.DefaultRepo{
-		Group: "voerp",
-	}
-	err := GetDefaultRepoByGroup(&dr)
-	if err != nil {
-		t.Error(err)
-	} else {
-		fmt.Println(dr.ProfileRepo["staging"])
-	}
-}
