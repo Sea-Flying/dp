@@ -4,7 +4,7 @@ ENV GOPROXY=https://goproxy.cn
 ENV GO111MODULE=on
 WORKDIR /app
 COPY . .
-RUN GOOS=linux go build -v -a -o dp .
+RUN CGO_ENABLED=0 GOOS=linux go build -v -a -o dp .
 
 FROM scratch
 # Since we started from scratch, we'll copy the SSL root certificates from the builder
