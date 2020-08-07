@@ -2,9 +2,6 @@
 FROM golang:1.13 AS builder
 ENV GOPROXY=https://goproxy.cn
 ENV GO111MODULE=on
-# We'll likely need to add SSL root certificates
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-    && apk --no-cache add ca-certificates
 WORKDIR /app
 COPY . .
 RUN GOOS=linux go build -v -a -o dp .
