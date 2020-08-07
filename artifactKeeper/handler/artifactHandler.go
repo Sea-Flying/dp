@@ -62,10 +62,10 @@ func CreateEntity(c *gin.Context) {
 	}
 	//如果entity的url为空，则生成为默认值
 	if entity.Url == "" {
-		switch entity.ClassKind {
-		case "jar":
+		switch {
+		case entity.ClassKind == "jar":
 			entity.Url = repo.BaseUrl + "/" + entity.Group + "-" + entity.Profile + "/" + entity.ClassName + "/" + entity.ClassName + "-" + entity.Version + ".jar"
-		case "docker":
+		case strings.HasPrefix(entity.ClassKind, "docker"):
 			entity.Url = repo.BaseUrl + "/" + entity.Group + "-" + entity.Profile + "/" + entity.ClassName + ":" + entity.Version
 		}
 		DPLogger.Printf("Entity Url not specify, use defaulf pattern generate it: %s \n", entity.Url)
