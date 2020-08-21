@@ -1,7 +1,12 @@
 base:
   http-port: 7654
+appPanel:
+  watcher-apps-regexp-include: '(?i)openvms.*|voerp.*'
+  watcher-apps-regexp-exclude: '(?i).*front.*'
 cassandra:
   hosts-urls: vo-dp-cassandra-1:9042
+consul:
+  api-url: http://10.0.0.152:8500
 nomad:
   api-url: http://10.0.0.152:4646
   region: vo-local

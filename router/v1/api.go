@@ -9,5 +9,6 @@ func InitApiRouter(Engine *gin.Engine) {
 	{
 		initArtifactApiGroup(ApiRouter)
 		InitScheduleApiGroup(ApiRouter)
+		initPanelApiGroup(ApiRouter)
 	}
 }

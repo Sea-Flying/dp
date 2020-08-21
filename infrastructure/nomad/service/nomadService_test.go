@@ -8,16 +8,18 @@ import (
 	"os"
 	"testing"
 	"voyageone.com/dp/infrastructure/model/config"
-	"voyageone.com/dp/infrastructure/model/global"
 )
 
-func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
-	config := api.DefaultConfig()
-	config.Address = nomadConfig.NomadApiUrl
+var nomadClient *VoNomadClient
+
+func initNomadClient(nomadConfig config.NomadConfig) (*VoNomadClient, error) {
+	clientConfig := api.DefaultConfig()
+	clientConfig.Address = nomadConfig.NomadApiUrl
 	if nomadConfig.NomadRegion != "" {
-		config.Region = nomadConfig.NomadRegion
+		clientConfig.Region = nomadConfig.NomadRegion
 	}
-	client, err := api.NewClient(config)
+	client, err := api.NewClient(clientConfig)
+	voNomadClient := NewVoNomadClient(client, log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Llongfile))
 	if err != nil {
 		return nil, err
 	}
@@ -29,23 +31,65 @@ func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return client, nil
+	return voNomadClient, nil
 }
 
 func init() {
-	_ = cleanenv.ReadConfig("D:/Develop/go/dp/dp.yml", &global.DPConfig)
+	var dpConfig config.DPConfig
+	_ = cleanenv.ReadConfig("E:/Develop/go/dp/dp.yml", &dpConfig)
 	var err error
-	global.NomadClient, err = initNomadClient(global.DPConfig.Nomad)
+	nomadClient, err = initNomadClient(dpConfig.Nomad)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func TestGetJobLastDeploymentHealth(t *testing.T) {
-	health, err := GetJobLastDeploymentHealth(global.NomadClient, "openvms-restapi-dp")
+	health, err := nomadClient.GetJobLastDeploymentHealth("count-api")
 	if err != nil {
 		t.Error(err)
 	} else {
 		fmt.Println(health)
+	}
+}
+
+func TestGetJobsList(t *testing.T) {
+	jobs, err := nomadClient.GetJobsList()
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(jobs)
+	}
+}
+
+func TestStopJob(t *testing.T) {
+	err := nomadClient.StopJob("count-api")
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetLastDeploymentAllocations(t *testing.T) {
+	a, err := nomadClient.GetLastDeploymentAllocations("count-api")
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(a)
+	}
+}
+
+func TestGetJobJson(t *testing.T) {
+	j, err := nomadClient.GetJobJson("count-api")
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(j)
+	}
+}
+
+func TestRestartJob(t *testing.T) {
+	err := nomadClient.RestartJob("count-api")
+	if err != nil {
+		t.Error(err)
 	}
 }

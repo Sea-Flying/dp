@@ -1,24 +1,28 @@
 package git
 
 import (
+	"errors"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"os"
+	"strings"
+	"sync"
 	. "voyageone.com/dp/infrastructure/model/global"
 	"voyageone.com/dp/infrastructure/utils"
 	"voyageone.com/dp/scheduler/model/repository"
-	"voyageone.com/dp/scheduler/service"
 )
 
-func GitCloneHclTemplate(job repository.DPJob, gitTargetDir string) error {
-	var nomadtemplate = repository.NomadTemplate{
+func CloneHclTemplate(job repository.DPJob, gitTargetDir string) (string, error) {
+	var nomadTemplate = repository.NomadTemplate{
 		Name: job.NomadTemplateName,
 	}
-	getNomadTplErr := service.GetNomadTemplateByName(&nomadtemplate)
+	getNomadTplErr := nomadTemplate.GetByName()
 	if getNomadTplErr != nil {
-		return getNomadTplErr
+		return "", getNomadTplErr
 	}
-	gitRepoDir := gitTargetDir + "/" + job.NomadTemplateName
+	splits := strings.Split(nomadTemplate.GitUrl, "/")
+	floderName := strings.Split(splits[len(splits)-1], ".git")[0]
+	gitRepoDir := gitTargetDir + "/" + floderName
 	var r *git.Repository
 	var gitOpenDirErr error
 	var httpAuth = http.BasicAuth{
@@ -29,7 +33,7 @@ func GitCloneHclTemplate(job repository.DPJob, gitTargetDir string) error {
 	if !utils.FileExists(gitRepoDir) {
 		mkdirError := os.MkdirAll(gitRepoDir, os.ModePerm|os.ModeDir)
 		if mkdirError != nil {
-			return mkdirError
+			return gitRepoDir, mkdirError
 		}
 		goto GitClone
 	}
@@ -42,25 +46,35 @@ func GitCloneHclTemplate(job repository.DPJob, gitTargetDir string) error {
 	}
 GitClone:
 	{
+		if _, ok := GitMutex[gitRepoDir]; !ok {
+			GitMutex[gitRepoDir] = &sync.Mutex{}
+		}
+		GitMutex[gitRepoDir].Lock()
+		defer GitMutex[gitRepoDir].Unlock()
 		_, gitCloneErr := git.PlainClone(gitRepoDir, false, &git.CloneOptions{
-			URL:      nomadtemplate.GitUrl,
+			URL:      nomadTemplate.GitUrl,
 			Auth:     &httpAuth,
 			Progress: DPLogger.Writer(),
 		})
-		return gitCloneErr
+		return gitRepoDir, gitCloneErr
 	}
 GitPull:
 	{
 		w, _ := r.Worktree()
+		if _, ok := GitMutex[gitRepoDir]; !ok {
+			GitMutex[gitRepoDir] = &sync.Mutex{}
+		}
+		GitMutex[gitRepoDir].Lock()
+		defer GitMutex[gitRepoDir].Unlock()
 		gitPullErr := w.Pull(&git.PullOptions{
 			RemoteName: "origin",
 			Auth:       &httpAuth,
 			Force:      true,
 		})
-		if gitPullErr == nil || gitPullErr == git.NoErrAlreadyUpToDate {
-			return nil
+		if gitPullErr == nil || errors.Is(gitPullErr, git.NoErrAlreadyUpToDate) {
+			return gitRepoDir, nil
 		} else {
-			return gitPullErr
+			return gitRepoDir, gitPullErr
 		}
 	}
 }

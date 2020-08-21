@@ -7,7 +7,7 @@ import (
 )
 
 func TestInitNomadClient(t *testing.T) {
-	InitConfig()
+	InitConfig("E:\\Develop\\go\\dp\\dp.yml")
 	c, err := initNomadClient(global.DPConfig.Nomad)
 	if err != nil {
 		t.Error(err)

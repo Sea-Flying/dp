@@ -3,8 +3,10 @@ package config
 type DPConfig struct {
 	Base      BaseConfig
 	Cassandra CassandraConfig
+	Consul    ConsulConfig
 	Nomad     NomadConfig
 	Gitlab    GitlabConfig
+	AppPanel  AppPanelConfig
 }
 
 type BaseConfig struct {
@@ -13,7 +15,12 @@ type BaseConfig struct {
 }
 
 type CassandraConfig struct {
-	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-default:"127.0.0.1:9043"`
+	HostsUrls string `yaml:"hosts-urls" env:"CASSANDRA_HOSTS_URLS" env-default:"127.0.0.1:9042"`
+}
+
+type ConsulConfig struct {
+	ConsulApiUrl     string `yaml:"api-url" env:"CONSUL_ADDR" env-default:"http://10.0.0.152:8500"`
+	ConsulDataCenter string `yaml:"datacenter" env:"CONSUL_DATACENTER" env-default:"vo-local"`
 }
 
 type NomadConfig struct {
@@ -26,4 +33,9 @@ type NomadConfig struct {
 type GitlabConfig struct {
 	Username string `yaml:"username" env:"GITLAB_USERNAME" env-default:"dp"`
 	Token    string `yaml:"token" env:"GITLAB_TOKEN" env-default:"f4fc2yUEsVxdfa9zG9ev"`
+}
+
+type AppPanelConfig struct {
+	WatcherAppsRegexpInclude string `yaml:"watcher-apps-regexp-include" env:"WATHCER_APPS_REGEXP_INCLUDE" env-default:"(?i)openvms-restapi-dp"`
+	WatcherAppsRegexpExclude string `yaml:"watcher-apps-regexp-exclude" env:"WATHCER_APPS_REGEXP_EXCLUDE" env-default:"(?i).*front.*"`
 }

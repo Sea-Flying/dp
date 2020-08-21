@@ -5,6 +5,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"testing"
 	"voyageone.com/dp/infrastructure/model/config"
+	"voyageone.com/dp/infrastructure/model/global"
 )
 
 var dpConfig config.DPConfig
@@ -12,5 +13,5 @@ var artifactCqlSession gocql.Session
 
 func TestCqlConnet(t *testing.T) {
 	_ = cleanenv.ReadConfig("dp.yml", &dpConfig)
-	InitCqlSession(dpConfig)
+	initCqlSession(global.DPConfig.Cassandra)
 }
