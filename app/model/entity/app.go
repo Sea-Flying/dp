@@ -27,18 +27,18 @@ type App struct {
 }
 
 func NewApp(appId string) *App {
-	unitTimeout, timeoutFactor, err := initAppTimeoutFiled(appId)
-	if err != nil {
-		DPLogger.Printf(`initAppTimeoutFiled() failed when NewApp(), error: %v \n`, err)
-		return nil
-	}
+	//unitTimeout, timeoutFactor, err := initAppTimeoutFiled(appId)
+	//if err != nil {
+	//	DPLogger.Printf(`initAppTimeoutFiled() failed when NewApp(), error: %v \n`, err)
+	//	return nil
+	//}
 	app := App{
 		AppId:                appId,
 		Deleted:              make(chan struct{}),
 		TimeoutCounter:       time.NewTimer(math.MaxInt64),
 		TimeoutCounterStatus: "idle",
-		UnitTimeoutSeconds:   unitTimeout,
-		TimeoutFactor:        timeoutFactor,
+		UnitTimeoutSeconds:   180,
+		TimeoutFactor:        1,
 		FSM: fsm.NewFSM(
 			"unhealthy",
 			fsm.Events{
