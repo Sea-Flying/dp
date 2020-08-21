@@ -10,7 +10,7 @@ build:
   image: docker:18.09
   only:
     refs:
-      - /^master$/
+      - /^old$/
   script:
     - docker build -t dp:$image_version .
     - docker tag dp:$image_version harbor.cloud-voyageone.cn/devops/dp:$image_version
@@ -24,7 +24,7 @@ run:
     - shell
   only:
     refs:
-      - /^master$/
+      - /^old$/
   script:
     - docker pull harbor.cloud-voyageone.cn/devops/dp:$image_version
     - docker stop vo-dp
