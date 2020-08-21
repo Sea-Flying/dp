@@ -3,19 +3,18 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"time"
 	"strings"
+	"time"
 	"voyageone.com/dp/artifactKeeper/model/repository"
-	"voyageone.com/dp/artifactKeeper/service"
 	"voyageone.com/dp/infrastructure/model/customType"
 	. "voyageone.com/dp/infrastructure/model/global"
 	"voyageone.com/dp/infrastructure/model/response"
 )
 
-func CreataRepo(c *gin.Context) {
+func CreateRepo(c *gin.Context) {
 	var repo repository.Repo
 	_ = c.ShouldBindJSON(&repo)
-	err := service.CreateOrUpdateRepo(repo)
+	err := repo.CreateOrUpdate()
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("Artifact Repo Create Failed, %v", err), c)
 	} else {
@@ -31,7 +30,7 @@ func CreateClass(c *gin.Context) {
 		response.FailWithMessage(fmt.Sprintf("artifact class create failed，%v", err), c)
 		return
 	}
-	err = service.CreateOrUpdateClass(class)
+	err = class.CreateOrUpdate()
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("Artifact Class Create Failed，%v", err), c)
 	} else {
@@ -43,15 +42,13 @@ func CreateEntity(c *gin.Context) {
 	var entity repository.Entity
 	_ = c.ShouldBindJSON(&entity)
 	var class = repository.Class{
-		Group:   entity.Group,
-		Name:    entity.ClassName,
-		Profile: entity.Profile,
+		Name: entity.ClassName,
 	}
-	_ = service.GetClassByPrimaryKey(&class)
+	_ = class.GetByPrimaryKey()
 	var repo = repository.Repo{
 		Name: class.RepoName,
 	}
-	err := service.GetRepoByName(&repo)
+	err := repo.GetByName()
 	if err != nil || repo.BaseUrl == "" {
 		DPLogger.Printf("Create or Update Entity Failed: repoName %s is not existed \n", entity.RepoName)
 		DPLogger.Println(err)
@@ -62,28 +59,30 @@ func CreateEntity(c *gin.Context) {
 		entity.ClassKind = class.Kind
 	}
 	//如果entity的url为空，则生成为默认值
+	//TODO 若之后class kind种类多了，或者需要灵活规则，考虑将下面这个if自动生成步骤放在client端或者server端的一个规则配置
 	if entity.Url == "" {
 		switch {
 		case entity.ClassKind == "jar":
-			entity.Url = repo.BaseUrl + "/" + entity.Group + "-" + entity.Profile + "/" + entity.ClassName + "/" + entity.ClassName + "-" + entity.Version + ".jar"
+			entity.Url = repo.BaseUrl + "/" + entity.ClassName + "/" + entity.ClassName + "-" + entity.Version + ".jar"
 		case strings.HasPrefix(entity.ClassKind, "docker"):
-			entity.Url = repo.BaseUrl + "/" + entity.Group + "-" + entity.Profile + "/" + entity.ClassName + ":" + entity.Version
+			entity.Url = repo.BaseUrl + "/" + entity.ClassName + ":" + entity.Version
 		}
 		DPLogger.Printf("Entity Url not specify, use defaulf pattern generate it: %s \n", entity.Url)
 	}
 	entity.GeneratedTime = time.Now()
-	err = service.CreateOrUpdateEntity(entity)
+	err = entity.CreateOrUpdate()
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("Artifact Entity Create Failed，%v", err), c)
 	} else {
-		response.OkWithMessage("Arifact Entity Create Success", c)
+		response.OkWithMessage("Artifact Entity Create Success", c)
 	}
 }
 
 func GetClass(c *gin.Context) {
-	var class repository.Class
-	_ = c.ShouldBindJSON(&class)
-	err := service.GetClassByPrimaryKey(&class)
+	var class = repository.Class{
+		Name: c.Param("className"),
+	}
+	err := class.GetByPrimaryKey()
 	if err != nil {
 		response.FailWithMessage(fmt.Sprintf("get artifact class failed: %#v", err), c)
 	} else {
@@ -93,15 +92,15 @@ func GetClass(c *gin.Context) {
 
 func fillDefaultsIntoClass(c *repository.Class) error {
 	var kind = repository.Kind{
-		Group: c.Group,
-		Name:  c.Kind,
+		Name: c.Kind,
 	}
-	err := service.GetKindByPrimaryKey(&kind)
+	err := kind.GetByPrimaryKey()
 	if err != nil {
 		return customType.DPError(fmt.Sprintf("fill class default template failed, invalid kind %#v", err))
 	}
 	c.CreatedTime = time.Now()
-	c.DefaultNomadTemplate = kind.ProfileDefaultTemplate[c.Profile]
-	c.RepoName = kind.ProfileDefaultRepo[c.Profile]
+	c.DefaultNomadTemplate = kind.DefaultTemplate
+	c.RepoName = kind.DefaultRepo
+	c.UnitTimeoutSeconds = kind.DefaultUnitTimeoutSeconds
 	return nil
 }
