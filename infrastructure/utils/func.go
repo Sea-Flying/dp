@@ -25,3 +25,30 @@ func FileExists(path string) bool {
 	}
 	return true
 }
+
+//merge two slice of unique elements into one
+func MergeStringSlice(a []string, b []string) (ret []string) {
+	ret = a
+	for _, i := range b {
+		var notExisted = true
+		for _, j := range a {
+			if j == i {
+				notExisted = false
+				break
+			}
+		}
+		if notExisted {
+			ret = append(ret, i)
+		}
+	}
+	return
+}
+
+func IsInSlice(s []string, e string) bool {
+	for _, i := range s {
+		if i == e {
+			return true
+		}
+	}
+	return false
+}

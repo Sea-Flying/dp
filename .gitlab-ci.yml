@@ -3,7 +3,7 @@ stages:
   - run
 
 variables:
-  image_version: beta
+  image_version: "0.1.0"
 
 build:
   stage: build
@@ -30,3 +30,4 @@ run:
     - docker stop vo-dp
     - docker rm vo-dp
     - docker run -d --name vo-dp --network vo-dp -p 10.0.0.143:7654:7654 harbor.cloud-voyageone.cn/devops/dp:$image_version
+    - docker update --restart unless-stopped

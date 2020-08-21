@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"time"
+	"voyageone.com/dp/app/service/watcher"
 	"voyageone.com/dp/infrastructure/initialize"
 	. "voyageone.com/dp/infrastructure/model/global"
 )
@@ -15,7 +16,10 @@ func main() {
 	initialize.InitConfig(*dpConfigPath)
 	initialize.InitCqlSession()
 	initialize.InitNomadClient()
+	initialize.InitConsulClient()
 	initialize.InitLogger()
+	initialize.InitWebsocket()
+	watcher.InitAppWatcher()
 	dpRouter := initialize.InitRouter()
 	dpServer := &http.Server{
 		Addr:           DPConfig.Base.HttpHost + ":" + DPConfig.Base.HttpPort,

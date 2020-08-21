@@ -6,6 +6,7 @@ import (
 	"os"
 	"voyageone.com/dp/infrastructure/model/config"
 	"voyageone.com/dp/infrastructure/model/global"
+	nomadService "voyageone.com/dp/infrastructure/nomad/service"
 )
 
 func InitNomadClient() {
@@ -16,16 +17,17 @@ func InitNomadClient() {
 	}
 }
 
-func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
-	config := api.DefaultConfig()
-	config.Address = nomadConfig.NomadApiUrl
+func initNomadClient(nomadConfig config.NomadConfig) (*nomadService.VoNomadClient, error) {
+	clientConfig := api.DefaultConfig()
+	clientConfig.Address = nomadConfig.NomadApiUrl
 	if nomadConfig.NomadRegion != "" {
-		config.Region = nomadConfig.NomadRegion
+		clientConfig.Region = nomadConfig.NomadRegion
 	}
-	client, err := api.NewClient(config)
+	client, err := api.NewClient(clientConfig)
 	if err != nil {
 		return nil, err
 	}
+	voNomadClient := nomadService.NewVoNomadClient(client, global.DPLogger)
 	err = os.MkdirAll(nomadConfig.NomadJobTplDir, os.ModeDir|os.ModePerm)
 	if err != nil {
 		return nil, err
@@ -34,5 +36,5 @@ func initNomadClient(nomadConfig config.NomadConfig) (*api.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return client, nil
+	return voNomadClient, nil
 }

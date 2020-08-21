@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"github.com/gocql/gocql"
+	"github.com/scylladb/gocqlx/v2"
 	"log"
 	"strings"
 	"time"
@@ -17,12 +18,12 @@ func InitCqlSession() {
 	}
 }
 
-func initCqlSession(cassandraConfig config.CassandraConfig) (*gocql.Session, error) {
+func initCqlSession(cassandraConfig config.CassandraConfig) (gocqlx.Session, error) {
 	urlsSlice := strings.Split(cassandraConfig.HostsUrls, ",")
 	cluster := gocql.NewCluster(urlsSlice...)
 	cluster.Consistency = gocql.Quorum
 	cluster.NumConns = 3
 	cluster.ConnectTimeout = 1 * time.Second
 	cluster.Timeout = 2 * time.Second
-	return cluster.CreateSession()
+	return gocqlx.WrapSession(cluster.CreateSession())
 }
