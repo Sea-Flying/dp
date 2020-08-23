@@ -6,9 +6,9 @@ appPanel:
 cassandra:
   hosts-urls: vo-dp-cassandra-1:9042
 consul:
-  api-url: http://10.0.0.152:8500
+  api-url: http://10.0.0.70:8500
 nomad:
-  api-url: http://10.0.0.152:4646
+  api-url: http://10.0.0.70:4646
   region: vo-local
   job-hcl-dir: "/app/jobHclDir"
   job-tpl-dir: "/app/jobTplDir"
