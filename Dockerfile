@@ -1,5 +1,5 @@
 # This file is a template, and might need editing before it works on your project.
-FROM golang:1.13 AS builder
+FROM golang:1.14 AS builder
 ENV GOPROXY=https://goproxy.cn
 ENV GO111MODULE=on
 WORKDIR /app
