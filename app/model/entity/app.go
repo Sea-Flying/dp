@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/nomad/api"
 	"github.com/looplab/fsm"
 	"math"
+	"math/rand"
 	"sync"
 	"time"
 	panelRepository "voyageone.com/dp/app/model/repository"
@@ -27,18 +28,14 @@ type App struct {
 }
 
 func NewApp(appId string) *App {
-	//unitTimeout, timeoutFactor, err := initAppTimeoutFiled(appId)
-	//if err != nil {
-	//	DPLogger.Printf(`initAppTimeoutFiled() failed when NewApp(), error: %v \n`, err)
-	//	return nil
-	//}
+	unitTimeout, timeoutFactor := initAppTimeoutFiled(appId)
 	app := App{
 		AppId:                appId,
 		Deleted:              make(chan struct{}),
 		TimeoutCounter:       time.NewTimer(math.MaxInt64),
 		TimeoutCounterStatus: "idle",
-		UnitTimeoutSeconds:   180,
-		TimeoutFactor:        1,
+		UnitTimeoutSeconds:   unitTimeout,
+		TimeoutFactor:        timeoutFactor,
 		FSM: fsm.NewFSM(
 			"unhealthy",
 			fsm.Events{
@@ -61,7 +58,8 @@ func NewApp(appId string) *App {
 }
 
 func (a *App) StartWatcher() {
-	a.WatcherTicker = time.NewTicker(6 * time.Second)
+	//5s轮询一次，加上一个2s内的随机时间分散请求
+	a.WatcherTicker = time.NewTicker(time.Duration(5000+rand.Int63n(2000)) * time.Millisecond)
 	go func() {
 		for {
 			select {
@@ -330,26 +328,33 @@ func getJobStatusFromNomadAndConsul(jobId string) (status string, err error) {
 	}
 }
 
-func initAppTimeoutFiled(appId string) (unitTimeout int, factor int, err error) {
-	nomadJob, err := NomadClient.GetJob(appId)
-	if err != nil {
-		return 0, 0, err
-	}
+func initAppTimeoutFiled(appId string) (unitTimeout int, factor int) {
+	var err error
 	artifactClass := artifactRepository.Class{
 		Name: appId,
 	}
 	err = artifactClass.GetByPrimaryKey()
 	if err != nil {
-		return 0, 0, err
-	}
-	var parallel int
-	if *(nomadJob.Update.Canary) == 0 {
-		parallel = *(nomadJob.Update.MaxParallel)
+		DPLogger.Printf("get artifact class error when initAppTimeoutFiled, error: %v\n", err)
+		//默认超时120s
+		unitTimeout = 120
 	} else {
-		parallel = *(nomadJob.Update.Canary)
+		unitTimeout = artifactClass.UnitTimeoutSeconds
 	}
-	count := *(nomadJob.TaskGroups[0].Count)
-	factor = int(math.Ceil(float64(count) / float64(parallel)))
-	unitTimeout = artifactClass.UnitTimeoutSeconds
+	nomadJob, err := NomadClient.GetJob(appId)
+	if err != nil {
+		DPLogger.Printf("get nomad job error when initAppTimeoutFiled, error: %v\n", err)
+		//默认实例并行后因子1
+		factor = 1
+	} else {
+		var parallel int
+		if *(nomadJob.Update.Canary) == 0 {
+			parallel = *(nomadJob.Update.MaxParallel)
+		} else {
+			parallel = *(nomadJob.Update.Canary)
+		}
+		count := *(nomadJob.TaskGroups[0].Count)
+		factor = int(math.Ceil(float64(count) / float64(parallel)))
+	}
 	return
 }
