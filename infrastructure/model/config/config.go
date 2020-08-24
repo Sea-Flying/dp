@@ -1,12 +1,12 @@
 package config
 
 type DPConfig struct {
-	Base      BaseConfig
-	Cassandra CassandraConfig
-	Consul    ConsulConfig
-	Nomad     NomadConfig
-	Gitlab    GitlabConfig
-	AppPanel  AppPanelConfig
+	Base      BaseConfig      `yaml:"base"`
+	Cassandra CassandraConfig `yaml:"cassandra"`
+	Consul    ConsulConfig    `yaml:"consul"`
+	Nomad     NomadConfig     `yaml:"nomad"`
+	Gitlab    GitlabConfig    `yaml:"gitlab"`
+	AppPanel  AppPanelConfig  `yaml:"appPanel"`
 }
 
 type BaseConfig struct {
