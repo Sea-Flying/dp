@@ -36,6 +36,6 @@ type GitlabConfig struct {
 }
 
 type AppPanelConfig struct {
-	WatcherAppsRegexpInclude string `yaml:"watcher-apps-regexp-include" env:"WATHCER_APPS_REGEXP_INCLUDE" env-default:"(?i)openvms-restapi-dp"`
+	WatcherAppsRegexpInclude string `yaml:"watcher-apps-regexp-include" env:"WATHCER_APPS_REGEXP_INCLUDE" env-default:"(?i)openvms.*|voerp.*"`
 	WatcherAppsRegexpExclude string `yaml:"watcher-apps-regexp-exclude" env:"WATHCER_APPS_REGEXP_EXCLUDE" env-default:"(?i).*front.*"`
 }

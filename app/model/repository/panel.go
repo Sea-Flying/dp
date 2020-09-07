@@ -49,15 +49,15 @@ func GetByAppNameOrderByTime(appName string, orderDirection qb.Order, pageSize i
 	if pageNum < 1 || pageSize < 1 {
 		return 0, nil, customType.DPError("invalid pageNum or pageSize when query status_history")
 	}
-	var statusHistories *[]StatusHistory
+	var statusHistories []StatusHistory
 	err = CqlSession.Query(qb.Select("app.status_history").
 		Where(qb.Eq("app_name")).
 		OrderBy("time", orderDirection).Limit(300).ToCql()).
-		Bind(appName).Iter().Select(statusHistories)
-	if err != nil || statusHistories == nil {
+		Bind(appName).Iter().Select(&statusHistories)
+	if err != nil || len(statusHistories) == 0 {
 		return
 	}
-	total = len(*statusHistories)
+	total = len(statusHistories)
 	var left, right int
 	if pageNum == 1 {
 		left = 0
@@ -66,7 +66,7 @@ func GetByAppNameOrderByTime(appName string, orderDirection qb.Order, pageSize i
 		left = pageSize*(pageNum-1) - 1
 		right = pageSize*pageNum - 1
 	}
-	ret = (*statusHistories)[left:right]
+	ret = statusHistories[left:right]
 	return
 }
 
