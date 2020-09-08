@@ -59,12 +59,10 @@ func GetByAppNameOrderByTime(appName string, orderDirection qb.Order, pageSize i
 	}
 	total = len(statusHistories)
 	var left, right int
-	if pageNum == 1 {
-		left = 0
-		right = pageSize - 1
-	} else {
-		left = pageSize*(pageNum-1) - 1
-		right = pageSize*pageNum - 1
+	left = pageSize * (pageNum - 1)
+	right = pageSize*pageNum - 1
+	if right > total {
+		right = total
 	}
 	ret = statusHistories[left:right]
 	return
