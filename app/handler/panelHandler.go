@@ -3,7 +3,9 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/scylladb/gocqlx/v2/qb"
 	"net/http"
+	panelRepository "voyageone.com/dp/app/model/repository"
 	watcherService "voyageone.com/dp/app/service/watcher"
 	. "voyageone.com/dp/infrastructure/model/global"
 )
@@ -11,6 +13,18 @@ import (
 type appCtlReq struct {
 	AppName string `json:"app_name"`
 	Action  string `json:"action"`
+}
+
+type appHistoryReq struct {
+	TimeOrder bool `json:"time_order"`
+	PageSize  int  `json:"page_size"`
+	PageNum   int  `json:"page_num"`
+}
+
+type appHistoryResp struct {
+	Total        int                             `json:"total"`
+	AppHistories []panelRepository.StatusHistory `json:"app_histories"`
+	Error        string                          `json:"error"`
 }
 
 func WsGetAppsStatus(c *gin.Context) {
@@ -55,6 +69,28 @@ func ControlApp(c *gin.Context) {
 		c.Status(http.StatusOK)
 		c.Writer.Write([]byte(fmt.Sprintf(`actiont "%s" for app "%s" executed`, appCtl.Action, appCtl.AppName)))
 	}
+}
+
+func GetAppStatusHistories(c *gin.Context) {
+	appId := c.Param("appId")
+	var historyReq appHistoryReq
+	_ = c.ShouldBindJSON(&historyReq)
+	var resp = appHistoryResp{}
+	var err error
+	resp.Total, resp.AppHistories, err =
+		panelRepository.GetByAppNameOrderByTime(appId, qb.Order(historyReq.TimeOrder), historyReq.PageSize, historyReq.PageNum)
+	var httpCode int
+	if err != nil {
+		resp.Error = err.Error()
+		httpCode = http.StatusBadRequest
+	} else {
+		httpCode = http.StatusOK
+	}
+	c.JSON(httpCode, resp)
+}
+
+func GetAppsStatusHistories(c *gin.Context) {
+
 }
 
 func AppMarkAsHealthy() {

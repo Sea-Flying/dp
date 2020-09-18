@@ -8,9 +8,11 @@ import (
 func initPanelApiGroup(apiRootRouter *gin.RouterGroup) {
 	panelApiGroup := apiRootRouter.Group("panel")
 	{
-		panelApiGroup.GET("ws/appstatus")
+		panelApiGroup.GET("ws/appstatus", handler.WsGetAppsStatus)
 		panelApiGroup.GET("apps-status", handler.GetAppsStatus)
 		panelApiGroup.GET("app-status/:appId", handler.GetAppStatus)
+		panelApiGroup.GET("apps-histories", handler.GetAppsStatusHistories)
+		panelApiGroup.GET("app-histories/:appId", handler.GetAppStatusHistories)
 		panelApiGroup.POST("control", handler.ControlApp)
 	}
 }

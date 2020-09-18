@@ -99,7 +99,12 @@ func fillDefaultsIntoClass(c *repository.Class) error {
 		return customType.DPError(fmt.Sprintf("fill class default template failed, invalid kind %#v", err))
 	}
 	c.CreatedTime = time.Now()
-	c.DefaultNomadTemplate = kind.DefaultTemplate
+	//workaround: 如果项目名称以"-task"结尾，则nomad的job模板文件使用以"-task"结尾的名称的模板
+	if strings.HasSuffix(c.Name, "-task") {
+		c.DefaultNomadTemplate = kind.DefaultTemplate + "-task"
+	} else {
+		c.DefaultNomadTemplate = kind.DefaultTemplate
+	}
 	c.RepoName = kind.DefaultRepo
 	c.UnitTimeoutSeconds = kind.DefaultUnitTimeoutSeconds
 	return nil

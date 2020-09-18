@@ -7,6 +7,7 @@ import (
 	"github.com/looplab/fsm"
 	"math"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 	panelRepository "voyageone.com/dp/app/model/repository"
@@ -82,7 +83,11 @@ func (a *App) RefreshAppsStatus() {
 	var err error
 	jobStatus, err := getJobStatusFromNomadAndConsul(a.AppId)
 	if err != nil {
-		DPLogger.Printf("error when get job [%s] status from Nomad\n, %v", a.AppId, err)
+		if strings.Contains(err.Error(), "job not found") {
+			a.SetState("stopped")
+		} else {
+			DPLogger.Printf("error when get job [%s] status from Nomad\n, %v", a.AppId, err)
+		}
 		return
 	}
 	a.RefreshMutex.Lock()
@@ -301,12 +306,11 @@ func (a *App) MarkAsUnhealthy() (err error) {
 func getJobStatusFromNomadAndConsul(jobId string) (status string, err error) {
 	nomadJob, err := NomadClient.GetJob(jobId)
 	if err != nil {
-		DPLogger.Printf("error when get job [%s] info from Nomad, error: %s", jobId, err)
 		return "unknown", err
 	}
 	consulServiceHealthyInstanceCount, err := ConsulClient.GetServiceHealthCheckPassNum(jobId)
 	if err != nil {
-		DPLogger.Printf("error when get job [%s] info from Consul, error: %s", jobId, err)
+		return "unknown", err
 	}
 	lastDeploymentStatus := NomadClient.GetJobLastDeploymentStatus(jobId)
 
