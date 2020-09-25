@@ -16,9 +16,9 @@ type appCtlReq struct {
 }
 
 type appHistoryReq struct {
-	TimeOrder bool `json:"time_order"`
-	PageSize  int  `json:"page_size"`
-	PageNum   int  `json:"page_num"`
+	TimeOrder bool `form:"time_order,default=true"`
+	PageSize  int  `form:"page_size,default=20"`
+	PageNum   int  `form:"page_num,default=1"`
 }
 
 type appHistoryResp struct {
@@ -74,7 +74,7 @@ func ControlApp(c *gin.Context) {
 func GetAppStatusHistories(c *gin.Context) {
 	appId := c.Param("appId")
 	var historyReq appHistoryReq
-	_ = c.ShouldBindJSON(&historyReq)
+	_ = c.ShouldBind(&historyReq)
 	var resp = appHistoryResp{}
 	var err error
 	resp.Total, resp.AppHistories, err =
