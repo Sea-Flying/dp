@@ -16,7 +16,7 @@ type appCtlReq struct {
 }
 
 type appHistoryReq struct {
-	TimeOrder bool `form:"time_order,default=true"`
+	TimeOrder bool `form:"time_order,default=false"`
 	PageSize  int  `form:"page_size,default=20"`
 	PageNum   int  `form:"page_num,default=1"`
 }
