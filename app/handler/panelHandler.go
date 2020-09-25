@@ -28,7 +28,7 @@ type appHistoryResp struct {
 }
 
 func WsGetAppsStatus(c *gin.Context) {
-	WsAppsStatus.HandleRequest(c.Writer, c.Request)
+	_ = WsAppsStatus.HandleRequest(c.Writer, c.Request)
 }
 
 func GetAppStatus(c *gin.Context) {
@@ -39,7 +39,7 @@ func GetAppStatus(c *gin.Context) {
 	} else {
 		c.Status(http.StatusBadRequest)
 	}
-	c.Writer.Write([]byte(appStatus))
+	_, _ = c.Writer.Write([]byte(appStatus))
 }
 
 func GetAppsStatus(c *gin.Context) {
@@ -49,7 +49,7 @@ func GetAppsStatus(c *gin.Context) {
 
 func ControlApp(c *gin.Context) {
 	var appCtl appCtlReq
-	c.ShouldBindJSON(&appCtl)
+	_ = c.ShouldBindJSON(&appCtl)
 	var err error
 	switch appCtl.Action {
 	case "start":
@@ -64,10 +64,10 @@ func ControlApp(c *gin.Context) {
 	}
 	if err != nil {
 		c.Status(http.StatusBadRequest)
-		c.Writer.Write([]byte("error: " + err.Error()))
+		_, _ = c.Writer.Write([]byte("error: " + err.Error()))
 	} else {
 		c.Status(http.StatusOK)
-		c.Writer.Write([]byte(fmt.Sprintf(`actiont "%s" for app "%s" executed`, appCtl.Action, appCtl.AppName)))
+		_, _ = c.Writer.Write([]byte(fmt.Sprintf(`actiont "%s" for app "%s" executed`, appCtl.Action, appCtl.AppName)))
 	}
 }
 
