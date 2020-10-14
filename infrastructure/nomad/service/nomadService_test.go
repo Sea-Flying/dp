@@ -36,7 +36,7 @@ func initNomadClient(nomadConfig config.NomadConfig) (*VoNomadClient, error) {
 
 func init() {
 	var dpConfig config.DPConfig
-	_ = cleanenv.ReadConfig("E:/Develop/go/dp/dp.yml", &dpConfig)
+	_ = cleanenv.ReadConfig("F:\\10.0.0.85\\devops\\dp\\dp.yml", &dpConfig)
 	var err error
 	nomadClient, err = initNomadClient(dpConfig.Nomad)
 	if err != nil {
@@ -80,6 +80,15 @@ func TestGetLastDeploymentAllocations(t *testing.T) {
 
 func TestGetJobJson(t *testing.T) {
 	j, err := nomadClient.GetJobJson("count-api")
+	if err != nil {
+		t.Error(err)
+	} else {
+		fmt.Println(j)
+	}
+}
+
+func TestGetJobRunningNetworksJson(t *testing.T) {
+	j, err := nomadClient.GetJobRunningNetworksJson("voerp-lms")
 	if err != nil {
 		t.Error(err)
 	} else {

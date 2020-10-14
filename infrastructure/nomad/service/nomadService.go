@@ -71,6 +71,31 @@ func (client *VoNomadClient) GetJobJson(jobId string) (jobJson string, err error
 	return
 }
 
+func (client *VoNomadClient) GetJobRunningNetworksJson(jobId string) (ns string, err error) {
+	jobs := client.Jobs()
+	stubs, _, err := jobs.Allocations(jobId, false, nil)
+	var stub *api.AllocationListStub
+	for i := range stubs {
+		stub = stubs[i]
+		if stub.DesiredStatus == "run" {
+			break
+		}
+	}
+	if stub == nil {
+		return "0", nil
+	}
+	allocations := client.Allocations()
+	info, _, err := allocations.Info(stub.ID, nil)
+	if err != nil {
+		return "", err
+	}
+	// TODO 这里可能调用链比较长，可能要想办法优化一下。另外写死的 "task" Task Key 也不太好。也需要另行优化
+	networks := info.AllocatedResources.Tasks["task"].Networks
+	nsb, _ := json.MarshalIndent(networks, "", "  ")
+	ns = string(nsb)
+	return
+}
+
 func (client *VoNomadClient) GetJobsList() (jobs []string, err error) {
 	var nomadJobsEndpoint = client.Jobs()
 	jobs = make([]string, 0, 100)
