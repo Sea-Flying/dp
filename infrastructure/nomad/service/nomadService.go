@@ -71,7 +71,7 @@ func (client *VoNomadClient) GetJobJson(jobId string) (jobJson string, err error
 	return
 }
 
-func (client *VoNomadClient) GetJobRunningNetworksJson(jobId string) (ns string, err error) {
+func (client *VoNomadClient) GetJobRunningNetworks(jobId string) (networks []*api.NetworkResource, err error) {
 	jobs := client.Jobs()
 	stubs, _, err := jobs.Allocations(jobId, false, nil)
 	var stub *api.AllocationListStub
@@ -82,15 +82,23 @@ func (client *VoNomadClient) GetJobRunningNetworksJson(jobId string) (ns string,
 		}
 	}
 	if stub == nil {
-		return "0", nil
+		return make([]*api.NetworkResource, 0), nil
 	}
 	allocations := client.Allocations()
 	info, _, err := allocations.Info(stub.ID, nil)
 	if err != nil {
-		return "", err
+		return make([]*api.NetworkResource, 0), nil
 	}
 	// TODO 这里可能调用链比较长，可能要想办法优化一下。另外写死的 "task" Task Key 也不太好。也需要另行优化
-	networks := info.AllocatedResources.Tasks["task"].Networks
+	networks = info.AllocatedResources.Tasks["task"].Networks
+	return
+}
+
+func (client *VoNomadClient) GetJobRunningNetworksJson(jobId string) (ns string, err error) {
+	networks, err := client.GetJobRunningNetworks(jobId)
+	if err != nil {
+		return "", nil
+	}
 	nsb, _ := json.MarshalIndent(networks, "", "  ")
 	ns = string(nsb)
 	return
