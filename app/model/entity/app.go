@@ -25,6 +25,7 @@ type App struct {
 	RefreshMutex         sync.Mutex
 	UnitTimeoutSeconds   int
 	TimeoutFactor        int
+	Networks             []*api.NetworkResource
 	*fsm.FSM
 }
 
@@ -124,6 +125,12 @@ func (a *App) RefreshAppsStatus() {
 	}
 	if err != nil {
 		DPLogger.Printf(`error when RefreshAppsStatus("%s"), current status: %s`, a.AppId, a.Current())
+	}
+	// TODO 先简单的放在最后，后边可能要调整执行位置。比如已经出错或者已经停止的，需要重置 Networks 数据
+	networks, err := NomadClient.GetJobRunningNetworks(a.AppId)
+	a.Networks = networks
+	if err != nil {
+		DPLogger.Printf(`error when GetJobRunningNetworks: %s`, err)
 	}
 }
 
