@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopkg.in/olahol/melody.v1"
 	"time"
@@ -32,7 +33,9 @@ func generateWsRet() string {
 	var ret = ``
 	ret += `[`
 	for appId, appEntity := range watcherService.AppWatchList {
-		ret += fmt.Sprintf(`{"appId":"%s","status":"%s"}`, appId, appEntity.Current())
+		bytes, _ := json.Marshal(appEntity.Networks)
+		s := string(bytes)
+		ret += fmt.Sprintf(`{"appId":"%s","status":"%s","networks":%s}`, appId, appEntity.Current(), s)
 		ret += `,`
 	}
 	ret = ret[0 : len(ret)-1]
